@@ -26,6 +26,58 @@
       </div>
 
       <div class="control-group">
+        <h3>Drawing</h3>
+        <label>
+          Tool
+          <select id="toolSelect">
+            <option value="brush">Brush</option>
+            <option value="line">Line</option>
+            <option value="rect">Rectangle</option>
+          </select>
+        </label>
+
+        <label>
+          Brush / Line Width: <span id="brushSizeValue">4</span>
+          <input type="range" id="brushSize" min="1" max="32" value="4" step="1">
+        </label>
+
+        <div class="color-section">
+          <div class="color-row">
+            <span class="color-label">Color</span>
+            <input type="color" id="colorPicker" value="#ffcc00">
+          </div>
+          <div id="colorPalette" class="color-palette">
+            <button class="color-swatch-btn" data-color="#ff4b4b" style="background:#ff4b4b;"></button>
+            <button class="color-swatch-btn" data-color="#ffb74b" style="background:#ffb74b;"></button>
+            <button class="color-swatch-btn" data-color="#ffe54b" style="background:#ffe54b;"></button>
+            <button class="color-swatch-btn" data-color="#4bff85" style="background:#4bff85;"></button>
+            <button class="color-swatch-btn" data-color="#4be0ff" style="background:#4be0ff;"></button>
+            <button class="color-swatch-btn" data-color="#4b6bff" style="background:#4b6bff;"></button>
+            <button class="color-swatch-btn" data-color="#d84bff" style="background:#d84bff;"></button>
+            <button class="color-swatch-btn" data-color="#f5f5f5" style="background:#f5f5f5;"></button>
+            <button class="color-swatch-btn" data-color="#888888" style="background:#888888;"></button>
+            <button class="color-swatch-btn" data-color="#111111" style="background:#111111;"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Rectangle</h3>
+        <div class="color-row">
+          <span class="color-label">Fill</span>
+          <input type="color" id="rectFillColor" value="#ffcc00">
+        </div>
+        <div class="color-row">
+          <span class="color-label">Outline</span>
+          <input type="color" id="rectStrokeColor" value="#111111">
+        </div>
+        <label>
+          Outline Width: <span id="outlineWidthValue">2</span>
+          <input type="range" id="outlineWidth" min="1" max="32" value="2" step="1">
+        </label>
+      </div>
+
+      <div class="control-group">
         <button id="loadImage">Load Image</button>
         <input type="file" id="imageInput" accept="image/*" style="display: none;">
         <button id="clear">Clear</button>

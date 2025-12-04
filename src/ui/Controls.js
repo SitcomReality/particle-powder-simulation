@@ -4,6 +4,15 @@ export class Controls {
     this.presetManager = presetManager;
     this.colorMapper = colorMapper;
     this.imageLoader = imageLoader;
+
+    this.state = {
+      tool: 'brush',
+      brushSize: 4,
+      color: '#ffcc00',
+      rectFillColor: '#ffcc00',
+      rectStrokeColor: '#111111',
+      outlineWidth: 2
+    };
     
     this.setupEventListeners();
     this.updatePresetList();
@@ -26,6 +35,56 @@ export class Controls {
       const speed = parseFloat(e.target.value);
       simSpeedValue.textContent = speed.toFixed(1);
       this.simulation.setSpeed(speed);
+    });
+
+    // Drawing tool
+    const toolSelect = document.getElementById('toolSelect');
+    toolSelect.addEventListener('change', (e) => {
+      this.state.tool = e.target.value;
+    });
+
+    // Brush / line width
+    const brushSizeInput = document.getElementById('brushSize');
+    const brushSizeValue = document.getElementById('brushSizeValue');
+    brushSizeInput.addEventListener('input', (e) => {
+      const size = parseInt(e.target.value, 10);
+      this.state.brushSize = size;
+      brushSizeValue.textContent = size;
+    });
+
+    // Primary color picker
+    const colorPicker = document.getElementById('colorPicker');
+    colorPicker.addEventListener('input', (e) => {
+      this.state.color = e.target.value;
+    });
+
+    // Color palette buttons
+    const palette = document.getElementById('colorPalette');
+    palette.addEventListener('click', (e) => {
+      const btn = e.target.closest('.color-swatch-btn');
+      if (!btn) return;
+      const color = btn.dataset.color;
+      this.state.color = color;
+      colorPicker.value = color;
+    });
+
+    // Rectangle fill / stroke colors
+    const rectFillColorInput = document.getElementById('rectFillColor');
+    const rectStrokeColorInput = document.getElementById('rectStrokeColor');
+    rectFillColorInput.addEventListener('input', (e) => {
+      this.state.rectFillColor = e.target.value;
+    });
+    rectStrokeColorInput.addEventListener('input', (e) => {
+      this.state.rectStrokeColor = e.target.value;
+    });
+
+    // Outline width
+    const outlineWidthInput = document.getElementById('outlineWidth');
+    const outlineWidthValue = document.getElementById('outlineWidthValue');
+    outlineWidthInput.addEventListener('input', (e) => {
+      const w = parseInt(e.target.value, 10);
+      this.state.outlineWidth = w;
+      outlineWidthValue.textContent = w;
     });
 
     // Load image
@@ -153,5 +212,29 @@ export class Controls {
       entry.appendChild(propList);
       container.appendChild(entry);
     }
+  }
+
+  getTool() {
+    return this.state.tool;
+  }
+
+  getBrushSize() {
+    return this.state.brushSize;
+  }
+
+  getColor() {
+    return this.state.color;
+  }
+
+  getRectFillColor() {
+    return this.state.rectFillColor;
+  }
+
+  getRectStrokeColor() {
+    return this.state.rectStrokeColor;
+  }
+
+  getOutlineWidth() {
+    return this.state.outlineWidth;
   }
 }

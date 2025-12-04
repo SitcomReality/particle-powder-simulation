@@ -122,6 +122,42 @@ h3 {
   border: 1px solid #444;
 }
 
+.color-section {
+  margin-top: 8px;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.color-label {
+  font-size: 11px;
+}
+
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.color-swatch-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid #444;
+  padding: 0;
+  margin: 0;
+}
+
+.color-swatch-btn:hover {
+  border-color: #fff;
+}
+
 .property-list {
   display: flex;
   flex-direction: column;
