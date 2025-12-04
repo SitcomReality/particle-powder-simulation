@@ -17,7 +17,10 @@ export class Simulation {
   }
 
   addParticles(particles) {
-    this.particles.push(...particles);
+    // Use iterative push to avoid potential call-stack overflow from spreading very large arrays
+    for (let i = 0; i < particles.length; i++) {
+      this.particles.push(particles[i]);
+    }
   }
 
   clear() {
