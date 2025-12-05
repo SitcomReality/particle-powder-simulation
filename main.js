@@ -45,6 +45,10 @@ class App {
     };
 
     this.lastTime = performance.now();
+    this.fpsDisplay = document.getElementById('fpsCounter');
+    this.frameCounter = 0;
+    this.fpsTime = 0;
+
     this.setupDrawing();
     this.animate();
     
@@ -68,8 +72,20 @@ class App {
     requestAnimationFrame(() => this.animate());
     
     const now = performance.now();
-    const dt = Math.min((now - this.lastTime) / 1000, 0.1);
+    const elapsed = now - this.lastTime;
+    const dt = Math.min(elapsed / 1000, 0.1);
     this.lastTime = now;
+
+    // FPS Calculation
+    this.frameCounter++;
+    this.fpsTime += elapsed;
+    
+    if (this.fpsTime >= 1000) {
+      const fps = Math.round(this.frameCounter / (this.fpsTime / 1000));
+      this.fpsDisplay.textContent = `FPS: ${fps}`;
+      this.frameCounter = 0;
+      this.fpsTime = 0;
+    }
     
     this.simulation.update(dt);
     this.renderer.render(this.simulation.particles);
