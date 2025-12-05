@@ -29,7 +29,7 @@ class App {
       this.imageLoader
     );
     
-    const defaultPreset = this.presetManager.getPreset('Mixed');
+    const defaultPreset = this.presetManager.getPreset('Balanced Spectrum');
     if (defaultPreset) {
       this.colorMapper.fromJSON(defaultPreset);
     }

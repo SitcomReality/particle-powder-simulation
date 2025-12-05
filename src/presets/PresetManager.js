@@ -6,7 +6,11 @@ export class PresetManager {
   }
 
   initializeDefaultPresets() {
-    if (this.presets.size === 0) {
+    // If our new-style presets are missing, replace whatever is stored
+    const hasBalancedSpectrum = this.presets.has('Balanced Spectrum');
+    if (!hasBalancedSpectrum) {
+      this.presets.clear();
+
       // Balanced, powder-game-like behavior across the spectrum
       this.savePreset('Balanced Spectrum', {
         gasLightnessMin: 78,
