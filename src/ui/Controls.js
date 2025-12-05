@@ -119,6 +119,8 @@ export class Controls {
         const preset = this.presetManager.getPreset(presetName);
         if (preset) {
           this.colorMapper.fromJSON(preset);
+          // Immediately update all existing particles to use the new spectral mapping
+          this.simulation.remapParticleProperties(this.colorMapper);
           this.updateColorMapDisplay();
         }
       }
@@ -127,6 +129,8 @@ export class Controls {
     // Randomize preset
     document.getElementById('randomizePreset').addEventListener('click', () => {
       this.colorMapper.randomizeMapping();
+      // Immediately update all existing particles when randomizing mapping
+      this.simulation.remapParticleProperties(this.colorMapper);
       this.updateColorMapDisplay();
     });
 

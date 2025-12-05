@@ -61,6 +61,20 @@ export class Simulation {
     // this.physics.resize(width, height);
   }
 
+  // Recompute properties (type, density, dispersion) for all existing particles
+  // using the current ColorMapper heuristic so presets immediately affect behavior.
+  remapParticleProperties(colorMapper) {
+    const cells = this.grid.cells;
+    for (let i = 0; i < cells.length; i++) {
+      const p = cells[i];
+      if (!p) continue;
+      const props = colorMapper.getProperties(p.color);
+      p.type = props.type;
+      p.density = props.density;
+      p.dispersion = props.dispersion;
+    }
+  }
+
   setPaused(paused) {
     this.paused = paused;
   }
