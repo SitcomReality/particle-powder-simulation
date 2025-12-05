@@ -1,17 +1,19 @@
 export class PhysicsEngine {
-  constructor(grid, width, height) {
+  constructor(grid) {
     this.grid = grid;
-    this.width = width;
-    this.height = height;
   }
 
   update(dt) {
+    // Get current grid dimensions every frame
+    const width = this.grid.width;
+    const height = this.grid.height;
+
     // Scan from bottom to top, randomize horizontal direction
     const dir = Math.random() < 0.5 ? 1 : -1;
     
-    for (let y = this.height - 1; y >= 0; y--) {
-      const startX = dir > 0 ? 0 : this.width - 1;
-      const endX = dir > 0 ? this.width : -1;
+    for (let y = height - 1; y >= 0; y--) {
+      const startX = dir > 0 ? 0 : width - 1;
+      const endX = dir > 0 ? width : -1;
       
       for (let x = startX; x !== endX; x += dir) {
         const particle = this.grid.get(x, y);
@@ -82,7 +84,10 @@ export class PhysicsEngine {
   }
 
   tryMove(particle, x1, y1, x2, y2) {
-    if (x2 < 0 || x2 >= this.width || y2 < 0 || y2 >= this.height) {
+    const width = this.grid.width;
+    const height = this.grid.height;
+
+    if (x2 < 0 || x2 >= width || y2 < 0 || y2 >= height) {
       return false;
     }
     
@@ -102,7 +107,6 @@ export class PhysicsEngine {
   }
 
   resize(width, height) {
-    this.width = width;
-    this.height = height;
+    // No longer needed; physics uses grid dimensions directly
   }
 }

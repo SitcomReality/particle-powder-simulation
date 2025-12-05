@@ -57,7 +57,8 @@ export class Simulation {
     this.width = width;
     this.height = height;
     this.grid.resize(width, height);
-    this.physics.resize(width, height);
+    // PhysicsEngine now reads dimensions from grid, no need to pass width/height
+    // this.physics.resize(width, height);
   }
 
   setPaused(paused) {
