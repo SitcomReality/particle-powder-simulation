@@ -15,11 +15,13 @@ export class Simulation {
   addParticle(particle) {
     const x = Math.floor(particle.x);
     const y = Math.floor(particle.y);
-    
-    // Only add if cell is empty
-    if (!this.grid.get(x, y)) {
-      this.grid.set(x, y, particle);
-    }
+
+    // Only attempt to place if coordinates are inside the grid bounds
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
+
+    // Overwrite whatever is at the target cell so drawing replaces existing particles.
+    // Grid.set will update particle.x/particle.y to the integer cell coordinates.
+    this.grid.set(x, y, particle);
   }
 
   addParticles(particles) {
