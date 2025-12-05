@@ -9,7 +9,6 @@ import { Particle } from './src/core/Particle.js';
 class App {
   constructor() {
     this.canvas = document.getElementById('canvas');
-    // Logical simulation scale: how many screen pixels per simulation cell
     this.simScale = 4;
     this.renderer = new Renderer(this.canvas, this.simScale);
     
@@ -17,8 +16,7 @@ class App {
     
     this.simulation = new Simulation(
       this.canvas.width / this.renderer.pixelRatio / this.simScale,
-      this.canvas.height / this.renderer.pixelRatio / this.simScale,
-      8
+      this.canvas.height / this.renderer.pixelRatio / this.simScale
     );
     
     this.colorMapper = new ColorMapper();
@@ -31,7 +29,6 @@ class App {
       this.imageLoader
     );
     
-    // Load default preset
     const defaultPreset = this.presetManager.getPreset('Mixed');
     if (defaultPreset) {
       this.colorMapper.fromJSON(defaultPreset);
@@ -78,7 +75,6 @@ class App {
     const dt = Math.min(elapsed / 1000, 0.1);
     this.lastTime = now;
 
-    // FPS Calculation
     this.frameCounter++;
     this.fpsTime += elapsed;
     
@@ -90,7 +86,7 @@ class App {
     }
     
     this.simulation.update(dt);
-    this.renderer.render(this.simulation.particles);
+    this.renderer.render(this.simulation.grid);
   }
 
   setupDrawing() {
@@ -98,8 +94,8 @@ class App {
 
     const getCoords = (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / this.simScale;
-      const y = (e.clientY - rect.top) / this.simScale;
+      const x = Math.floor((e.clientX - rect.left) / this.simScale);
+      const y = Math.floor((e.clientY - rect.top) / this.simScale);
       return { x, y };
     };
 

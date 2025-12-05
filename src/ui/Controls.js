@@ -19,15 +19,6 @@ export class Controls {
   }
 
   setupEventListeners() {
-    // Grid size
-    const gridSizeInput = document.getElementById('gridSize');
-    const gridSizeValue = document.getElementById('gridSizeValue');
-    gridSizeInput.addEventListener('input', (e) => {
-      const size = parseInt(e.target.value);
-      gridSizeValue.textContent = size;
-      this.simulation.setGridSize(size);
-    });
-
     // Simulation speed
     const simSpeedInput = document.getElementById('simSpeed');
     const simSpeedValue = document.getElementById('simSpeedValue');
@@ -204,12 +195,14 @@ export class Controls {
       propList.className = 'property-list';
       
       for (const [key, value] of Object.entries(properties)) {
+        const propItem = document.createElement('div');
+        propItem.className = 'property-item';
         if (typeof value === 'number') {
-          const propItem = document.createElement('div');
-          propItem.className = 'property-item';
           propItem.innerHTML = `<span>${key}:</span><span>${value.toFixed(2)}</span>`;
-          propList.appendChild(propItem);
+        } else {
+          propItem.innerHTML = `<span>${key}:</span><span>${value}</span>`;
         }
+        propList.appendChild(propItem);
       }
       
       entry.appendChild(swatch);

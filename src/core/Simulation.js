@@ -2,66 +2,62 @@ import { Grid } from './Grid.js';
 import { PhysicsEngine } from '../physics/PhysicsEngine.js';
 
 export class Simulation {
-  constructor(width, height, gridCellSize = 8) {
+  constructor(width, height) {
     this.width = width;
     this.height = height;
-    this.particles = [];
-    this.grid = new Grid(width, height, gridCellSize);
+    this.grid = new Grid(width, height);
     this.physics = new PhysicsEngine(this.grid, width, height);
     this.paused = false;
     this.speed = 1.0;
+    this.stepAccumulator = 0;
   }
 
   addParticle(particle) {
-    this.particles.push(particle);
+    const x = Math.floor(particle.x);
+    const y = Math.floor(particle.y);
+    
+    // Only add if cell is empty
+    if (!this.grid.get(x, y)) {
+      this.grid.set(x, y, particle);
+    }
   }
 
   addParticles(particles) {
-    // Use iterative push to avoid potential call-stack overflow from spreading very large arrays
-    for (let i = 0; i < particles.length; i++) {
-      this.particles.push(particles[i]);
+    for (const particle of particles) {
+      this.addParticle(particle);
     }
   }
 
   clear() {
-    this.particles.length = 0;
     this.grid.clear();
   }
 
   update(dt) {
     if (this.paused) return;
 
-    const adjustedDt = dt * this.speed;
-
-    // Reset update flags
-    for (const particle of this.particles) {
-      particle.resetUpdateFlag();
+    // Fixed timestep for stability
+    const fixedDt = 1 / 60;
+    this.stepAccumulator += dt * this.speed;
+    
+    let steps = 0;
+    const maxSteps = 3; // Prevent spiral of death
+    
+    while (this.stepAccumulator >= fixedDt && steps < maxSteps) {
+      this.physics.update(fixedDt);
+      this.stepAccumulator -= fixedDt;
+      steps++;
     }
-
-    // Rebuild grid
-    this.grid.clear();
-    for (const particle of this.particles) {
-      this.grid.addParticle(particle);
+    
+    if (this.stepAccumulator >= fixedDt * maxSteps) {
+      this.stepAccumulator = 0;
     }
-
-    // Update particles
-    this.physics.update(this.particles, adjustedDt);
-
-    // Remove out-of-bounds particles
-    this.particles = this.particles.filter(p => 
-      p.x >= 0 && p.x < this.width && p.y >= 0 && p.y < this.height
-    );
   }
 
   resize(width, height) {
     this.width = width;
     this.height = height;
-    this.grid.resize(width, height, this.grid.cellSize);
+    this.grid.resize(width, height);
     this.physics.resize(width, height);
-  }
-
-  setGridSize(cellSize) {
-    this.grid.resize(this.width, this.height, cellSize);
   }
 
   setPaused(paused) {
@@ -70,5 +66,9 @@ export class Simulation {
 
   setSpeed(speed) {
     this.speed = speed;
+  }
+
+  get particles() {
+    return this.grid.getAllParticles();
   }
 }

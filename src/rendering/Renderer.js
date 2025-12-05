@@ -12,25 +12,26 @@ export class Renderer {
     this.canvas.style.width = width + 'px';
     this.canvas.style.height = height + 'px';
 
-    // Reset transform before applying new scale
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(this.pixelRatio, this.pixelRatio);
   }
 
-  render(particles) {
+  render(grid) {
     // Clear canvas
     this.ctx.fillStyle = '#000';
     this.ctx.fillRect(0, 0, this.canvas.width / this.pixelRatio, this.canvas.height / this.pixelRatio);
     
-    // Render particles on a low-resolution grid
     const s = this.scale;
-    for (const particle of particles) {
-      this.ctx.fillStyle = particle.color;
-      this.ctx.fillRect(
-        Math.floor(particle.x) * s,
-        Math.floor(particle.y) * s,
-        s, s
-      );
+    
+    // Render grid cells directly
+    for (let y = 0; y < grid.height; y++) {
+      for (let x = 0; x < grid.width; x++) {
+        const particle = grid.get(x, y);
+        if (particle) {
+          this.ctx.fillStyle = particle.color;
+          this.ctx.fillRect(x * s, y * s, s, s);
+        }
+      }
     }
   }
 }

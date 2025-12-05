@@ -15,23 +15,34 @@ export class ColorMapper {
     const rgb = this.hexToRgb(color);
     const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
 
-    return {
-      gravity: this.mapRange(hsl.l, 0, 100, 0.8, 0.1),
-      friction: this.mapRange(hsl.s, 0, 100, 0.95, 0.99),
-      bounciness: this.mapRange(hsl.h, 0, 360, 0.1, 0.8),
-      slipperiness: this.mapRange(rgb.g, 0, 255, 0.2, 0.9),
-      density: this.mapRange(rgb.b, 0, 255, 0.5, 2.0),
-      inertiaResistance: this.mapRange(hsl.l, 0, 100, 0.3, 0.05),
-      type: this.determineType(hsl),
-      liquid: hsl.s > 50 && hsl.l > 40 && hsl.l < 70,
-      gas: hsl.l > 80
-    };
-  }
+    // Determine type based on lightness and saturation
+    let type = 'powder';
+    let density = 1.0;
+    let dispersion = 1;
 
-  determineType(hsl) {
-    if (hsl.l > 80) return 'gas';
-    if (hsl.s > 50 && hsl.l > 40 && hsl.l < 70) return 'liquid';
-    return 'powder';
+    if (hsl.l > 75) {
+      // Very light = gas
+      type = 'gas';
+      density = 0.1 + (hsl.s / 100) * 0.3;
+      dispersion = 3 + Math.floor(hsl.h / 60);
+    } else if (hsl.s > 60 && hsl.l > 30 && hsl.l < 75) {
+      // Saturated mid-tones = liquid
+      type = 'liquid';
+      density = 0.8 + (hsl.l / 100) * 0.4;
+      dispersion = 2 + Math.floor(hsl.h / 120);
+    } else if (hsl.l < 30 || (hsl.s < 30 && hsl.l > 40)) {
+      // Dark or desaturated = solid
+      type = 'solid';
+      density = 2.0 + (1 - hsl.l / 100) * 1.0;
+      dispersion = 0;
+    } else {
+      // Default powder
+      type = 'powder';
+      density = 1.0 + (1 - hsl.l / 100) * 0.8;
+      dispersion = 1;
+    }
+
+    return { type, density, dispersion };
   }
 
   mapRange(value, inMin, inMax, outMin, outMax) {
@@ -39,7 +50,7 @@ export class ColorMapper {
   }
 
   hexToRgb(hex) {
-    const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
       r: parseInt(result[1], 16),
       g: parseInt(result[2], 16),
@@ -79,17 +90,21 @@ export class ColorMapper {
   randomizeMapping(colors) {
     this.colorMap.clear();
 
+    const types = ['powder', 'liquid', 'gas', 'solid'];
+    
     for (const color of colors) {
+      const type = types[Math.floor(Math.random() * types.length)];
+      
       const properties = {
-        gravity: Math.random() * 1.0 - 0.2,
-        friction: 0.9 + Math.random() * 0.09,
-        bounciness: Math.random() * 0.8,
-        slipperiness: Math.random(),
-        density: 0.5 + Math.random() * 1.5,
-        inertiaResistance: Math.random() * 0.3,
-        type: ['powder', 'liquid', 'gas'][Math.floor(Math.random() * 3)],
-        liquid: Math.random() > 0.7,
-        gas: Math.random() > 0.9
+        type,
+        density: type === 'gas' ? 0.1 + Math.random() * 0.4 :
+                type === 'liquid' ? 0.8 + Math.random() * 0.5 :
+                type === 'solid' ? 2.0 + Math.random() * 1.5 :
+                1.0 + Math.random() * 1.0,
+        dispersion: type === 'gas' ? 3 + Math.floor(Math.random() * 4) :
+                   type === 'liquid' ? 2 + Math.floor(Math.random() * 3) :
+                   type === 'solid' ? 0 :
+                   Math.floor(Math.random() * 2)
       };
 
       this.colorMap.set(color, properties);
