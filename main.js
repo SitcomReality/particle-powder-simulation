@@ -9,13 +9,15 @@ import { Particle } from './src/core/Particle.js';
 class App {
   constructor() {
     this.canvas = document.getElementById('canvas');
-    this.renderer = new Renderer(this.canvas);
+    // Logical simulation scale: how many screen pixels per simulation cell
+    this.simScale = 4;
+    this.renderer = new Renderer(this.canvas, this.simScale);
     
     this.resize();
     
     this.simulation = new Simulation(
-      this.canvas.width / this.renderer.pixelRatio,
-      this.canvas.height / this.renderer.pixelRatio,
+      this.canvas.width / this.renderer.pixelRatio / this.simScale,
+      this.canvas.height / this.renderer.pixelRatio / this.simScale,
       8
     );
     
@@ -62,8 +64,8 @@ class App {
     
     if (this.simulation) {
       this.simulation.resize(
-        width / this.renderer.pixelRatio,
-        height / this.renderer.pixelRatio
+        width / this.renderer.pixelRatio / this.simScale,
+        height / this.renderer.pixelRatio / this.simScale
       );
     }
   }
@@ -96,8 +98,8 @@ class App {
 
     const getCoords = (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = (e.clientX - rect.left) / this.simScale;
+      const y = (e.clientY - rect.top) / this.simScale;
       return { x, y };
     };
 

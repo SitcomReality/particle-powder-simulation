@@ -5,7 +5,7 @@ export class ImageLoader {
     this.colorMapper = colorMapper;
   }
 
-  async loadImage(file) {
+  async loadImage(file, targetWidth, targetHeight) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -13,7 +13,7 @@ export class ImageLoader {
         const img = new Image();
         
         img.onload = () => {
-          const particles = this.imageToParticles(img);
+          const particles = this.imageToParticles(img, targetWidth, targetHeight);
           resolve(particles);
         };
         
@@ -26,18 +26,29 @@ export class ImageLoader {
     });
   }
 
-  imageToParticles(img) {
+  imageToParticles(img, targetWidth, targetHeight) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
-    // Scale down if too large
+
+    // Determine target dimensions for the logical simulation grid
     const maxDim = 400;
-    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-    const width = Math.floor(img.width * scale);
-    const height = Math.floor(img.height * scale);
+    const desiredWidth = targetWidth ? Math.min(targetWidth, maxDim) : maxDim;
+    const desiredHeight = targetHeight ? Math.min(targetHeight, maxDim) : maxDim;
+
+    const scale = Math.min(
+      1,
+      desiredWidth / img.width,
+      desiredHeight / img.height
+    );
+
+    const width = Math.max(1, Math.floor(img.width * scale));
+    const height = Math.max(1, Math.floor(img.height * scale));
     
     canvas.width = width;
     canvas.height = height;
+
+    // Draw scaled image; browser will do minimal filtering, preserving color regions reasonably
+    ctx.imageSmoothingEnabled = true;
     ctx.drawImage(img, 0, 0, width, height);
     
     const imageData = ctx.getImageData(0, 0, width, height);

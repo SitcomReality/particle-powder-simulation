@@ -95,7 +95,11 @@ export class Controls {
       const file = e.target.files[0];
       if (file) {
         try {
-          const particles = await this.imageLoader.loadImage(file);
+          const particles = await this.imageLoader.loadImage(
+            file,
+            this.simulation.width,
+            this.simulation.height
+          );
           this.simulation.clear();
           this.simulation.addParticles(particles);
         } catch (err) {
