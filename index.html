@@ -38,7 +38,10 @@
         <div class="color-section">
           <div class="color-row">
             <span class="color-label">Color</span>
-            <input type="color" id="colorPicker" value="#ffcc00">
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="color" id="colorPicker" value="#ffcc00">
+              <button id="eyedropBrush" title="Pick color from canvas" style="padding:6px;">🎯</button>
+            </div>
           </div>
           <div id="colorPalette" class="color-palette">
             <button class="color-swatch-btn" data-color="#ff4b4b" style="background:#ff4b4b;"></button>
@@ -59,11 +62,23 @@
         <h3>Rectangle</h3>
         <div class="color-row">
           <span class="color-label">Fill</span>
-          <input type="color" id="rectFillColor" value="#ffcc00">
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="color" id="rectFillColor" value="#ffcc00">
+            <button id="eyedropRectFill" title="Pick fill color from canvas" style="padding:6px;">🎯</button>
+            <label style="margin-left:6px; font-size:11px;">
+              <input type="checkbox" id="rectFillEnabled" checked> Fill
+            </label>
+          </div>
         </div>
         <div class="color-row">
           <span class="color-label">Outline</span>
-          <input type="color" id="rectStrokeColor" value="#111111">
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="color" id="rectStrokeColor" value="#111111">
+            <button id="eyedropRectStroke" title="Pick outline color from canvas" style="padding:6px;">🎯</button>
+            <label style="margin-left:6px; font-size:11px;">
+              <input type="checkbox" id="rectStrokeEnabled" checked> Outline
+            </label>
+          </div>
         </div>
         <label>
           Outline Width: <span id="outlineWidthValue">2</span>

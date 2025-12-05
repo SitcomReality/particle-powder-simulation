@@ -1,9 +1,10 @@
 export class Controls {
-  constructor(simulation, presetManager, colorMapper, imageLoader) {
+  constructor(simulation, presetManager, colorMapper, imageLoader, sampleCallback) {
     this.simulation = simulation;
     this.presetManager = presetManager;
     this.colorMapper = colorMapper;
     this.imageLoader = imageLoader;
+    this.sampleCallback = sampleCallback; // function(clientX, clientY) -> particle or null
 
     this.state = {
       tool: 'brush',
@@ -11,8 +12,12 @@ export class Controls {
       color: '#ffcc00',
       rectFillColor: '#ffcc00',
       rectStrokeColor: '#111111',
-      outlineWidth: 2
+      outlineWidth: 2,
+      rectFillEnabled: true,
+      rectStrokeEnabled: true
     };
+    
+    this.awaitingPick = null; // 'brush' | 'rectFill' | 'rectStroke' | null
     
     this.setupEventListeners();
     this.updatePresetList();
@@ -49,6 +54,10 @@ export class Controls {
       this.state.color = e.target.value;
     });
 
+    // Eyedropper for brush
+    const eyedropBrush = document.getElementById('eyedropBrush');
+    eyedropBrush.addEventListener('click', () => this.startPick('brush'));
+
     // Color palette buttons
     const palette = document.getElementById('colorPalette');
     palette.addEventListener('click', (e) => {
@@ -67,6 +76,22 @@ export class Controls {
     });
     rectStrokeColorInput.addEventListener('input', (e) => {
       this.state.rectStrokeColor = e.target.value;
+    });
+
+    // Eyedroppers for rect
+    const eyedropRectFill = document.getElementById('eyedropRectFill');
+    const eyedropRectStroke = document.getElementById('eyedropRectStroke');
+    eyedropRectFill.addEventListener('click', () => this.startPick('rectFill'));
+    eyedropRectStroke.addEventListener('click', () => this.startPick('rectStroke'));
+
+    // Fill / stroke toggles
+    const rectFillEnabledInput = document.getElementById('rectFillEnabled');
+    const rectStrokeEnabledInput = document.getElementById('rectStrokeEnabled');
+    rectFillEnabledInput.addEventListener('change', (e) => {
+      this.state.rectFillEnabled = !!e.target.checked;
+    });
+    rectStrokeEnabledInput.addEventListener('change', (e) => {
+      this.state.rectStrokeEnabled = !!e.target.checked;
     });
 
     // Outline width
@@ -256,6 +281,14 @@ export class Controls {
     return this.state.color;
   }
 
+  getRectFillEnabled() {
+    return !!this.state.rectFillEnabled;
+  }
+
+  getRectStrokeEnabled() {
+    return !!this.state.rectStrokeEnabled;
+  }
+
   getRectFillColor() {
     return this.state.rectFillColor;
   }
@@ -266,5 +299,41 @@ export class Controls {
 
   getOutlineWidth() {
     return this.state.outlineWidth;
+  }
+
+  startPick(target) {
+    // target is 'brush' | 'rectFill' | 'rectStroke'
+    this.awaitingPick = target;
+    // Temporarily change cursor to crosshair
+    document.body.style.cursor = 'crosshair';
+
+    const onPointer = (ev) => {
+      // Use the provided sampling callback to get particle under pointer
+      const sample = this.sampleCallback ? this.sampleCallback(ev.clientX, ev.clientY) : null;
+      if (sample && sample.color) {
+        if (this.awaitingPick === 'brush') {
+          this.state.color = sample.color;
+          const cp = document.getElementById('colorPicker');
+          if (cp) cp.value = sample.color;
+        } else if (this.awaitingPick === 'rectFill') {
+          this.state.rectFillColor = sample.color;
+          const rf = document.getElementById('rectFillColor');
+          if (rf) rf.value = sample.color;
+        } else if (this.awaitingPick === 'rectStroke') {
+          this.state.rectStrokeColor = sample.color;
+          const rs = document.getElementById('rectStrokeColor');
+          if (rs) rs.value = sample.color;
+        }
+      }
+      cleanup();
+    };
+
+    const cleanup = () => {
+      document.body.style.cursor = '';
+      this.awaitingPick = null;
+      window.removeEventListener('pointerdown', onPointer);
+    };
+
+    window.addEventListener('pointerdown', onPointer, { once: true });
   }
 }

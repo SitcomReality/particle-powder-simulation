@@ -26,7 +26,8 @@ class App {
       this.simulation,
       this.presetManager,
       this.colorMapper,
-      this.imageLoader
+      this.imageLoader,
+      this.getParticleAtScreen.bind(this) // pass sampling callback
     );
     
     const defaultPreset = this.presetManager.getPreset('Balanced Spectrum');
@@ -251,6 +252,8 @@ class App {
     const fillColor = this.controls.getRectFillColor();
     const strokeColor = this.controls.getRectStrokeColor();
     const outlineWidth = this.controls.getOutlineWidth();
+    const fillEnabled = this.controls.getRectFillEnabled();
+    const strokeEnabled = this.controls.getRectStrokeEnabled();
 
     const minX = Math.floor(Math.min(x0, x1));
     const maxX = Math.floor(Math.max(x0, x1));
@@ -274,12 +277,21 @@ class App {
         const isBorder = inLeft || inRight || inTop || inBottom;
 
         if (isBorder) {
-          this.createParticleAt(x, y, strokeColor);
+          if (strokeEnabled) this.createParticleAt(x, y, strokeColor);
         } else {
-          this.createParticleAt(x, y, fillColor);
+          if (fillEnabled) this.createParticleAt(x, y, fillColor);
         }
       }
     }
+  }
+
+  getParticleAtScreen(clientX, clientY) {
+    // Map client coordinates to simulation grid coordinates and return particle if present
+    const rect = this.canvas.getBoundingClientRect();
+    const x = Math.floor((clientX - rect.left) / this.simScale);
+    const y = Math.floor((clientY - rect.top) / this.simScale);
+    if (x < 0 || x >= this.simulation.width || y < 0 || y >= this.simulation.height) return null;
+    return this.simulation.grid.get(x, y) || null;
   }
 }
 
