@@ -1,52 +1,95 @@
 export class ColorMapper {
   constructor() {
-    this.colorMap = new Map();
+    // Store preset as a spectral heuristic instead of individual color mappings
+    this.preset = this.createDefaultPreset();
   }
 
-  setMapping(color, properties) {
-    this.colorMap.set(color, properties);
+  createDefaultPreset() {
+    return {
+      // Thresholds for type classification based on HSL
+      gasLightnessMin: 75,
+      liquidSaturationMin: 60,
+      liquidLightnessMin: 30,
+      liquidLightnessMax: 75,
+      solidLightnessMax: 30,
+      solidSaturationMax: 30,
+      solidLightnessMin: 40,
+      
+      // Density ranges for each type
+      gasDensityMin: 0.1,
+      gasDensityMax: 0.4,
+      liquidDensityMin: 0.8,
+      liquidDensityMax: 1.3,
+      solidDensityMin: 2.0,
+      solidDensityMax: 3.5,
+      powderDensityMin: 1.0,
+      powderDensityMax: 1.8,
+      
+      // Dispersion ranges
+      gasDispersionMin: 3,
+      gasDispersionMax: 7,
+      liquidDispersionMin: 2,
+      liquidDispersionMax: 4,
+      powderDispersionMin: 0,
+      powderDispersionMax: 1,
+      
+      // Modulation - how much hue/saturation affect properties
+      hueModulation: 0.3,
+      saturationModulation: 0.2
+    };
   }
 
   getProperties(color) {
-    return this.colorMap.get(color) || this.generatePropertiesFromColor(color);
-  }
-
-  generatePropertiesFromColor(color) {
     const rgb = this.hexToRgb(color);
     const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
-
-    // Determine type based on lightness and saturation
+    
+    const p = this.preset;
+    
+    // Determine type based on thresholds
     let type = 'powder';
-    let density = 1.0;
-    let dispersion = 1;
-
-    if (hsl.l > 75) {
-      // Very light = gas
+    if (hsl.l >= p.gasLightnessMin) {
       type = 'gas';
-      density = 0.1 + (hsl.s / 100) * 0.3;
-      dispersion = 3 + Math.floor(hsl.h / 60);
-    } else if (hsl.s > 60 && hsl.l > 30 && hsl.l < 75) {
-      // Saturated mid-tones = liquid
+    } else if (hsl.s >= p.liquidSaturationMin && 
+               hsl.l >= p.liquidLightnessMin && 
+               hsl.l < p.liquidLightnessMax) {
       type = 'liquid';
-      density = 0.8 + (hsl.l / 100) * 0.4;
-      dispersion = 2 + Math.floor(hsl.h / 120);
-    } else if (hsl.l < 30 || (hsl.s < 30 && hsl.l > 40)) {
-      // Dark or desaturated = solid
+    } else if (hsl.l < p.solidLightnessMax || 
+               (hsl.s < p.solidSaturationMax && hsl.l >= p.solidLightnessMin)) {
       type = 'solid';
-      density = 2.0 + (1 - hsl.l / 100) * 1.0;
-      dispersion = 0;
-    } else {
-      // Default powder
-      type = 'powder';
-      density = 1.0 + (1 - hsl.l / 100) * 0.8;
-      dispersion = 1;
     }
-
+    
+    // Calculate properties with modulation based on hue and saturation
+    const hueNorm = hsl.h / 360; // 0-1
+    const satNorm = hsl.s / 100; // 0-1
+    const lightNorm = hsl.l / 100; // 0-1
+    
+    let density, dispersion;
+    
+    if (type === 'gas') {
+      const range = p.gasDensityMax - p.gasDensityMin;
+      density = p.gasDensityMin + range * (satNorm * p.saturationModulation + lightNorm * (1 - p.saturationModulation));
+      
+      const dispRange = p.gasDispersionMax - p.gasDispersionMin;
+      dispersion = Math.floor(p.gasDispersionMin + dispRange * (hueNorm * p.hueModulation + (1 - lightNorm) * (1 - p.hueModulation)));
+    } else if (type === 'liquid') {
+      const range = p.liquidDensityMax - p.liquidDensityMin;
+      density = p.liquidDensityMin + range * lightNorm;
+      
+      const dispRange = p.liquidDispersionMax - p.liquidDispersionMin;
+      dispersion = Math.floor(p.liquidDispersionMin + dispRange * (0.5 + hueNorm * p.hueModulation));
+    } else if (type === 'solid') {
+      const range = p.solidDensityMax - p.solidDensityMin;
+      density = p.solidDensityMin + range * (1 - lightNorm);
+      dispersion = 0;
+    } else { // powder
+      const range = p.powderDensityMax - p.powderDensityMin;
+      density = p.powderDensityMin + range * (1 - lightNorm);
+      
+      const dispRange = p.powderDispersionMax - p.powderDispersionMin;
+      dispersion = Math.floor(p.powderDispersionMin + dispRange * satNorm);
+    }
+    
     return { type, density, dispersion };
-  }
-
-  mapRange(value, inMin, inMax, outMin, outMax) {
-    return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
   }
 
   hexToRgb(hex) {
@@ -87,38 +130,43 @@ export class ColorMapper {
     };
   }
 
-  randomizeMapping(colors) {
-    this.colorMap.clear();
-
-    const types = ['powder', 'liquid', 'gas', 'solid'];
-    
-    for (const color of colors) {
-      const type = types[Math.floor(Math.random() * types.length)];
+  randomizeMapping() {
+    // Randomize the spectral heuristic thresholds and parameters
+    this.preset = {
+      gasLightnessMin: 60 + Math.random() * 25,
+      liquidSaturationMin: 40 + Math.random() * 40,
+      liquidLightnessMin: 20 + Math.random() * 20,
+      liquidLightnessMax: 60 + Math.random() * 25,
+      solidLightnessMax: 15 + Math.random() * 25,
+      solidSaturationMax: 20 + Math.random() * 30,
+      solidLightnessMin: 35 + Math.random() * 15,
       
-      const properties = {
-        type,
-        density: type === 'gas' ? 0.1 + Math.random() * 0.4 :
-                type === 'liquid' ? 0.8 + Math.random() * 0.5 :
-                type === 'solid' ? 2.0 + Math.random() * 1.5 :
-                1.0 + Math.random() * 1.0,
-        dispersion: type === 'gas' ? 3 + Math.floor(Math.random() * 4) :
-                   type === 'liquid' ? 2 + Math.floor(Math.random() * 3) :
-                   type === 'solid' ? 0 :
-                   Math.floor(Math.random() * 2)
-      };
-
-      this.colorMap.set(color, properties);
-    }
+      gasDensityMin: 0.05 + Math.random() * 0.15,
+      gasDensityMax: 0.3 + Math.random() * 0.3,
+      liquidDensityMin: 0.6 + Math.random() * 0.4,
+      liquidDensityMax: 1.0 + Math.random() * 0.5,
+      solidDensityMin: 1.5 + Math.random() * 1.0,
+      solidDensityMax: 2.5 + Math.random() * 1.5,
+      powderDensityMin: 0.8 + Math.random() * 0.5,
+      powderDensityMax: 1.3 + Math.random() * 0.8,
+      
+      gasDispersionMin: 2 + Math.floor(Math.random() * 3),
+      gasDispersionMax: 5 + Math.floor(Math.random() * 4),
+      liquidDispersionMin: 1 + Math.floor(Math.random() * 2),
+      liquidDispersionMax: 3 + Math.floor(Math.random() * 3),
+      powderDispersionMin: 0,
+      powderDispersionMax: Math.floor(Math.random() * 2),
+      
+      hueModulation: 0.1 + Math.random() * 0.4,
+      saturationModulation: 0.1 + Math.random() * 0.4
+    };
   }
 
   toJSON() {
-    return Array.from(this.colorMap.entries());
+    return this.preset;
   }
 
-  fromJSON(data) {
-    this.colorMap.clear();
-    for (const [color, properties] of data) {
-      this.colorMap.set(color, properties);
-    }
+  fromJSON(preset) {
+    this.preset = preset;
   }
 }

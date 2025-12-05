@@ -126,11 +126,7 @@ export class Controls {
 
     // Randomize preset
     document.getElementById('randomizePreset').addEventListener('click', () => {
-      const uniqueColors = new Set();
-      for (const particle of this.simulation.particles) {
-        uniqueColors.add(particle.color);
-      }
-      this.colorMapper.randomizeMapping(Array.from(uniqueColors));
+      this.colorMapper.randomizeMapping();
       this.updateColorMapDisplay();
     });
 
@@ -181,9 +177,41 @@ export class Controls {
     const container = document.getElementById('colorMapContent');
     container.innerHTML = '';
     
-    const colorMapData = this.colorMapper.toJSON();
+    const preset = this.colorMapper.toJSON();
     
-    for (const [color, properties] of colorMapData) {
+    // Display preset parameters
+    const title = document.createElement('h4');
+    title.textContent = 'Spectral Heuristic Parameters';
+    title.style.fontSize = '11px';
+    title.style.marginBottom = '8px';
+    container.appendChild(title);
+    
+    for (const [key, value] of Object.entries(preset)) {
+      const item = document.createElement('div');
+      item.className = 'property-item';
+      item.style.fontSize = '10px';
+      item.style.marginBottom = '3px';
+      
+      const displayValue = typeof value === 'number' ? value.toFixed(2) : value;
+      item.innerHTML = `<span>${key}:</span><span>${displayValue}</span>`;
+      container.appendChild(item);
+    }
+    
+    // Show color samples
+    const samplesTitle = document.createElement('h4');
+    samplesTitle.textContent = 'Color Samples';
+    samplesTitle.style.fontSize = '11px';
+    samplesTitle.style.marginTop = '12px';
+    samplesTitle.style.marginBottom = '8px';
+    container.appendChild(samplesTitle);
+    
+    const sampleColors = [
+      '#ff0000', '#00ff00', '#0000ff', 
+      '#ffff00', '#00ffff', '#ff00ff',
+      '#ffffff', '#808080', '#000000'
+    ];
+    
+    for (const color of sampleColors) {
       const entry = document.createElement('div');
       entry.className = 'color-map-entry';
       
@@ -191,10 +219,11 @@ export class Controls {
       swatch.className = 'color-swatch';
       swatch.style.backgroundColor = color;
       
+      const props = this.colorMapper.getProperties(color);
       const propList = document.createElement('div');
       propList.className = 'property-list';
       
-      for (const [key, value] of Object.entries(properties)) {
+      for (const [key, value] of Object.entries(props)) {
         const propItem = document.createElement('div');
         propItem.className = 'property-item';
         if (typeof value === 'number') {

@@ -7,49 +7,113 @@ export class PresetManager {
 
   initializeDefaultPresets() {
     if (this.presets.size === 0) {
-      // Sand preset
-      this.savePreset('Sand', [
-        ['#c2b280', { type: 'powder', density: 1.4, dispersion: 1 }],
-        ['#d4a574', { type: 'powder', density: 1.3, dispersion: 1 }],
-        ['#8b7355', { type: 'powder', density: 1.6, dispersion: 0 }]
-      ]);
+      // Balanced preset
+      this.savePreset('Balanced', {
+        gasLightnessMin: 75,
+        liquidSaturationMin: 60,
+        liquidLightnessMin: 30,
+        liquidLightnessMax: 75,
+        solidLightnessMax: 30,
+        solidSaturationMax: 30,
+        solidLightnessMin: 40,
+        gasDensityMin: 0.1,
+        gasDensityMax: 0.4,
+        liquidDensityMin: 0.8,
+        liquidDensityMax: 1.3,
+        solidDensityMin: 2.0,
+        solidDensityMax: 3.5,
+        powderDensityMin: 1.0,
+        powderDensityMax: 1.8,
+        gasDispersionMin: 3,
+        gasDispersionMax: 7,
+        liquidDispersionMin: 2,
+        liquidDispersionMax: 4,
+        powderDispersionMin: 0,
+        powderDispersionMax: 1,
+        hueModulation: 0.3,
+        saturationModulation: 0.2
+      });
 
-      // Water preset
-      this.savePreset('Water', [
-        ['#4a90e2', { type: 'liquid', density: 1.0, dispersion: 3 }],
-        ['#5ca3f5', { type: 'liquid', density: 0.95, dispersion: 3 }],
-        ['#3d7bc7', { type: 'liquid', density: 1.05, dispersion: 2 }]
-      ]);
+      // Light = Gas preset
+      this.savePreset('Light Gases', {
+        gasLightnessMin: 50,
+        liquidSaturationMin: 70,
+        liquidLightnessMin: 20,
+        liquidLightnessMax: 50,
+        solidLightnessMax: 20,
+        solidSaturationMax: 25,
+        solidLightnessMin: 35,
+        gasDensityMin: 0.05,
+        gasDensityMax: 0.3,
+        liquidDensityMin: 0.9,
+        liquidDensityMax: 1.4,
+        solidDensityMin: 2.5,
+        solidDensityMax: 4.0,
+        powderDensityMin: 1.2,
+        powderDensityMax: 2.0,
+        gasDispersionMin: 4,
+        gasDispersionMax: 8,
+        liquidDispersionMin: 2,
+        liquidDispersionMax: 4,
+        powderDispersionMin: 0,
+        powderDispersionMax: 1,
+        hueModulation: 0.4,
+        saturationModulation: 0.3
+      });
 
-      // Gas preset
-      this.savePreset('Gas', [
-        ['#ff4500', { type: 'gas', density: 0.2, dispersion: 5 }],
-        ['#ff6347', { type: 'gas', density: 0.15, dispersion: 4 }],
-        ['#ffa500', { type: 'gas', density: 0.3, dispersion: 4 }]
-      ]);
+      // Saturated = Liquid preset
+      this.savePreset('Vibrant Liquids', {
+        gasLightnessMin: 85,
+        liquidSaturationMin: 45,
+        liquidLightnessMin: 25,
+        liquidLightnessMax: 85,
+        solidLightnessMax: 25,
+        solidSaturationMax: 20,
+        solidLightnessMin: 50,
+        gasDensityMin: 0.1,
+        gasDensityMax: 0.35,
+        liquidDensityMin: 0.7,
+        liquidDensityMax: 1.2,
+        solidDensityMin: 2.2,
+        solidDensityMax: 3.8,
+        powderDensityMin: 1.1,
+        powderDensityMax: 1.9,
+        gasDispersionMin: 3,
+        gasDispersionMax: 6,
+        liquidDispersionMin: 3,
+        liquidDispersionMax: 5,
+        powderDispersionMin: 0,
+        powderDispersionMax: 1,
+        hueModulation: 0.2,
+        saturationModulation: 0.3
+      });
 
-      // Mixed preset
-      this.savePreset('Mixed', [
-        ['#c2b280', { type: 'powder', density: 1.4, dispersion: 1 }],
-        ['#4a90e2', { type: 'liquid', density: 1.0, dispersion: 3 }],
-        ['#228b22', { type: 'powder', density: 1.7, dispersion: 0 }],
-        ['#ff4500', { type: 'gas', density: 0.2, dispersion: 5 }],
-        ['#8b4513', { type: 'solid', density: 3.0, dispersion: 0 }]
-      ]);
-
-      // Palette-based preset
-      this.savePreset('Palette Mix', [
-        ['#ff4b4b', { type: 'powder', density: 1.3, dispersion: 1 }],
-        ['#ffb74b', { type: 'powder', density: 1.5, dispersion: 1 }],
-        ['#ffe54b', { type: 'powder', density: 1.2, dispersion: 1 }],
-        ['#4bff85', { type: 'liquid', density: 0.9, dispersion: 3 }],
-        ['#4be0ff', { type: 'liquid', density: 1.0, dispersion: 3 }],
-        ['#4b6bff', { type: 'liquid', density: 1.1, dispersion: 2 }],
-        ['#d84bff', { type: 'gas', density: 0.2, dispersion: 5 }],
-        ['#f5f5f5', { type: 'gas', density: 0.15, dispersion: 6 }],
-        ['#888888', { type: 'solid', density: 2.5, dispersion: 0 }],
-        ['#111111', { type: 'solid', density: 3.0, dispersion: 0 }]
-      ]);
+      // Dark = Solid preset
+      this.savePreset('Heavy Solids', {
+        gasLightnessMin: 80,
+        liquidSaturationMin: 65,
+        liquidLightnessMin: 40,
+        liquidLightnessMax: 80,
+        solidLightnessMax: 40,
+        solidSaturationMax: 35,
+        solidLightnessMin: 45,
+        gasDensityMin: 0.08,
+        gasDensityMax: 0.35,
+        liquidDensityMin: 0.9,
+        liquidDensityMax: 1.4,
+        solidDensityMin: 2.0,
+        solidDensityMax: 4.5,
+        powderDensityMin: 1.3,
+        powderDensityMax: 2.2,
+        gasDispersionMin: 3,
+        gasDispersionMax: 7,
+        liquidDispersionMin: 2,
+        liquidDispersionMax: 4,
+        powderDispersionMin: 0,
+        powderDispersionMax: 1,
+        hueModulation: 0.25,
+        saturationModulation: 0.15
+      });
     }
   }
 
