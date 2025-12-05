@@ -13,6 +13,11 @@ export class Controls {
       rectStrokeColor: '#111111',
       outlineWidth: 2
     };
+
+    // Ensure default presets exist before we populate the UI
+    if (typeof this.presetManager.initializeDefaultPresets === 'function') {
+      this.presetManager.initializeDefaultPresets();
+    }
     
     this.setupEventListeners();
     this.updatePresetList();
