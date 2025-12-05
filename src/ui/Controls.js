@@ -124,6 +124,39 @@ export class Controls {
       }
     });
 
+    // Load calibration quadrants
+    const quadRoseBtn = document.getElementById('loadQuadRose');
+    const quadCyberpunkBtn = document.getElementById('loadQuadCyberpunk');
+    const quadDesertBtn = document.getElementById('loadQuadDesert');
+    const quadGeometryBtn = document.getElementById('loadQuadGeometry');
+
+    const loadQuadrant = async (index) => {
+      try {
+        const particles = await this.imageLoader.loadPresetQuadrant(
+          index,
+          this.simulation.width,
+          this.simulation.height
+        );
+        this.simulation.clear();
+        this.simulation.addParticles(particles);
+      } catch (err) {
+        console.error('Failed to load calibration quadrant:', err);
+      }
+    };
+
+    if (quadRoseBtn) {
+      quadRoseBtn.addEventListener('click', () => loadQuadrant(0));
+    }
+    if (quadCyberpunkBtn) {
+      quadCyberpunkBtn.addEventListener('click', () => loadQuadrant(1));
+    }
+    if (quadDesertBtn) {
+      quadDesertBtn.addEventListener('click', () => loadQuadrant(2));
+    }
+    if (quadGeometryBtn) {
+      quadGeometryBtn.addEventListener('click', () => loadQuadrant(3));
+    }
+
     // Clear
     document.getElementById('clear').addEventListener('click', () => {
       this.simulation.clear();

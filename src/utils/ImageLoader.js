@@ -26,9 +26,15 @@ export class ImageLoader {
     });
   }
 
-  imageToParticles(img, targetWidth, targetHeight) {
+  imageToParticles(img, targetWidth, targetHeight, sourceRect = null) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+
+    // Determine source region (full image by default, or a quadrant sub-rect)
+    const sx = sourceRect ? sourceRect.sx : 0;
+    const sy = sourceRect ? sourceRect.sy : 0;
+    const sWidth = sourceRect ? sourceRect.sWidth : img.width;
+    const sHeight = sourceRect ? sourceRect.sHeight : img.height;
 
     // Determine target dimensions for the logical simulation grid
     const maxDim = 400;
@@ -37,19 +43,19 @@ export class ImageLoader {
 
     const scale = Math.min(
       1,
-      desiredWidth / img.width,
-      desiredHeight / img.height
+      desiredWidth / sWidth,
+      desiredHeight / sHeight
     );
 
-    const width = Math.max(1, Math.floor(img.width * scale));
-    const height = Math.max(1, Math.floor(img.height * scale));
+    const width = Math.max(1, Math.floor(sWidth * scale));
+    const height = Math.max(1, Math.floor(sHeight * scale));
     
     canvas.width = width;
     canvas.height = height;
 
-    // Draw scaled image; browser will do minimal filtering, preserving color regions reasonably
+    // Draw scaled image region; browser will do minimal filtering, preserving color regions reasonably
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(img, 0, 0, width, height);
+    ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, width, height);
     
     const imageData = ctx.getImageData(0, 0, width, height);
     const particles = [];
@@ -88,6 +94,35 @@ export class ImageLoader {
     }
     
     return particles;
+  }
+
+  loadPresetQuadrant(quadrantIndex, targetWidth, targetHeight) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // Assume a 2x2 grid; compute quadrant bounds
+        const cols = 2;
+        const rows = 2;
+        const quadWidth = img.width / cols;
+        const quadHeight = img.height / rows;
+
+        const row = Math.floor(quadrantIndex / cols);
+        const col = quadrantIndex % cols;
+
+        const sx = col * quadWidth;
+        const sy = row * quadHeight;
+
+        const particles = this.imageToParticles(
+          img,
+          targetWidth,
+          targetHeight,
+          { sx, sy, sWidth: quadWidth, sHeight: quadHeight }
+        );
+        resolve(particles);
+      };
+      img.onerror = reject;
+      img.src = 'calibrationquadrants.jpg';
+    });
   }
 
   rgbToHex(r, g, b) {
