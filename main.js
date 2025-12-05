@@ -9,6 +9,7 @@ import { Particle } from './src/core/Particle.js';
 class App {
   constructor() {
     this.canvas = document.getElementById('canvas');
+    this.canvasContainer = document.getElementById('canvasContainer');
     this.simScale = 4;
     this.renderer = new Renderer(this.canvas, this.simScale);
     
@@ -56,8 +57,14 @@ class App {
   }
 
   resize() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const container = this.canvasContainer || this.canvas.parentElement;
+    const rect = container.getBoundingClientRect();
+
+    // Keep the simulation area square based on available space
+    const size = Math.floor(Math.min(rect.width, rect.height));
+    const width = size;
+    const height = size;
+
     this.renderer.resize(width, height);
     
     if (this.simulation) {

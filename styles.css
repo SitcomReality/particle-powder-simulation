@@ -14,9 +14,43 @@ body {
 #app {
   width: 100vw;
   height: 100vh;
-  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Main layout: canvas + sidebar */
+#mainLayout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+}
+
+/* Canvas container (square area) */
+#canvasContainer {
+  position: relative;
+  flex: 1;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sidebar on the right */
+#sidebar {
+  width: 300px;
+  max-width: 40vw;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 12px;
+  overflow-y: auto;
+}
+
+/* Original controls now live inside sidebar */
+#controls {
+  width: 100%;
+}
+
+/* FPS counter inside canvas area */
 #fpsCounter {
   position: absolute;
   top: 10px;
@@ -36,25 +70,29 @@ body {
   image-rendering: pixelated;
 }
 
-#controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 15px;
-  border-radius: 4px;
-  min-width: 250px;
-  max-height: 90vh;
-  overflow-y: auto;
+/* Drawing controls bar (separate from sidebar) */
+#drawingControls {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 8px 10px;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
 }
 
-.control-group {
+.drawing-group {
+  min-width: 180px;
+  flex: 1;
+}
+
+#controls .control-group {
   margin-bottom: 15px;
   padding-bottom: 15px;
   border-bottom: 1px solid #333;
 }
 
-.control-group:last-child {
+#controls .control-group:last-child {
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
@@ -87,7 +125,8 @@ button:hover {
   background: #ddd;
 }
 
-select, input[type="text"] {
+select,
+input[type="text"] {
   width: 100%;
   padding: 6px;
   margin: 2px 0;
@@ -104,6 +143,7 @@ h3 {
   font-weight: 600;
 }
 
+/* Color map panel remains floating */
 #colorMapPanel {
   position: absolute;
   top: 10px;
@@ -179,4 +219,40 @@ h3 {
 .property-item {
   display: flex;
   justify-content: space-between;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  body {
+    overflow: auto;
+  }
+
+  #mainLayout {
+    flex-direction: column;
+  }
+
+  #sidebar {
+    width: 100%;
+    max-width: none;
+    max-height: 40vh;
+  }
+
+  /* Keep canvas area square on small screens */
+  #canvasContainer {
+    width: 100vw;
+    height: 100vw;
+  }
+
+  #drawingControls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    border-top: 1px solid #444;
+  }
+
+  #sidebar {
+    padding-bottom: 60px; /* space so bottom bar doesn't overlap */
+  }
 }
