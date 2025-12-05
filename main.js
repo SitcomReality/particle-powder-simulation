@@ -54,6 +54,32 @@ class App {
     this.animate();
     
     window.addEventListener('resize', () => this.resize());
+
+    // Start paused and load one of the first three quadrants (Rose, Cyberpunk, Desert)
+    this.simulation.setPaused(true);
+    const pauseBtn = document.getElementById('pause');
+    if (pauseBtn) pauseBtn.textContent = 'Resume';
+
+    // Load a random quadrant among 0 (Rose), 1 (Cyberpunk), 2 (Desert)
+    this.loadInitialQuadrant();
+  }
+
+  async loadInitialQuadrant() {
+    try {
+      const choice = [0, 1, 2];
+      const idx = choice[Math.floor(Math.random() * choice.length)];
+      const particles = await this.imageLoader.loadPresetQuadrant(
+        idx,
+        this.simulation.width,
+        this.simulation.height
+      );
+      this.simulation.clear();
+      this.simulation.addParticles(particles);
+      // After loading, ensure particle properties match current color mapping
+      this.simulation.remapParticleProperties(this.colorMapper);
+    } catch (err) {
+      console.error('Failed to load initial quadrant:', err);
+    }
   }
 
   resize() {
