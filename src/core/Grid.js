@@ -1,12 +1,28 @@
 export class Grid {
   constructor(width, height) {
-    this.width = width;
-    this.height = height;
-    this.cells = new Array(width * height);
+    // Coerce to safe integers and enforce minimums to avoid invalid array lengths
+    this.width = Math.max(1, Math.floor(Number(width) || 0));
+    this.height = Math.max(1, Math.floor(Number(height) || 0));
+
+    // Guard against absurdly large grids (protect browser)
+    const maxCells = 2 ** 20; // ~1,048,576 cells by default
+    const requested = this.width * this.height;
+    if (requested > maxCells) {
+      // Scale down while preserving aspect ratio
+      const scale = Math.sqrt(maxCells / requested);
+      this.width = Math.max(1, Math.floor(this.width * scale));
+      this.height = Math.max(1, Math.floor(this.height * scale));
+    }
+
+    this.cells = new Array(this.width * this.height).fill(null);
   }
 
   clear() {
-    this.cells.fill(null);
+    if (!this.cells || this.cells.length !== this.width * this.height) {
+      this.cells = new Array(this.width * this.height).fill(null);
+    } else {
+      this.cells.fill(null);
+    }
   }
 
   get(x, y) {
@@ -53,9 +69,20 @@ export class Grid {
   }
 
   resize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.cells = new Array(width * height);
+    // Coerce and enforce minimums
+    this.width = Math.max(1, Math.floor(Number(width) || 0));
+    this.height = Math.max(1, Math.floor(Number(height) || 0));
+
+    // Guard against very large sizes similarly to constructor
+    const maxCells = 2 ** 20;
+    const requested = this.width * this.height;
+    if (requested > maxCells) {
+      const scale = Math.sqrt(maxCells / requested);
+      this.width = Math.max(1, Math.floor(this.width * scale));
+      this.height = Math.max(1, Math.floor(this.height * scale));
+    }
+
+    this.cells = new Array(this.width * this.height).fill(null);
   }
 
   getAllParticles() {
